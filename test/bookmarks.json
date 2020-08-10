@@ -1,0 +1,11 @@
+{
+    "dir" : [{
+        "id" : "je.ed.bookmark.dir.1",
+        "path" : "c:/a/websites/bookmarks-sync-sql-cogmios",
+        "root" : "./test/testfiles",
+        "lang" : "en_nl"
+    }],
+    "databaselocation" : {
+        "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/db/bookmarks.db"
+    }
+}
