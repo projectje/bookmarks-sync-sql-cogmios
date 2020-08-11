@@ -4,6 +4,7 @@ import util = require('util')
 import * as fs from 'fs'
 import {DatabaseCore} from "sqljs-wrapper-cogmios"
 export const readdir = util.promisify(fs.readdir);
+import {InternalDatabase} from "../database"
 
 /**
  * Reads a directory of URL files
@@ -31,23 +32,12 @@ export class ParseUrl {
             //console.log(relativeroot)
           } else {
             let fullname = `${dir}${path.sep}${dirent.name}`
+            let name = `${dir.substr(this.rootLength)}${path.sep}${dirent.name.split('.').slice(0, -1).join('.')}`;
+
             var file = ini.parse(fs.readFileSync(fullname, 'utf-8'))
-            const url = file.InternetShortcut.URL // todo URL files without url ...
-
-            let instance = DatabaseCore.getInstance()
-            let itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?`, [url]);
-            if (Object.keys(itemUrl).length === 0 && itemUrl.constructor === Object) {
-                await instance.run(`INSERT into itemUrl (url) VALUES (?)`,[url] );
-                itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?;`, [url]);
-            }
-            let id = itemUrl.id
-
-            let fullrelativepath = `${dir.substr(this.rootLength)}${path.sep}${dirent.name.split('.').slice(0, -1).join('.')}`;
-            console.log(id)
-            console.log(fullrelativepath)
-            // then add to this id in foreign key table the id to full path
-            await instance.run("INSERT into itemProperty (itemUrlId, itemKey, itemValue) VALUES (?, ?, ?)", [id, this.pathId ,fullrelativepath])
-
+            let interndatabase = new InternalDatabase()
+            let id = await interndatabase.insertItemUrl(file.InternetShortcut.URL)
+            await interndatabase.insertName(id, this.pathId, name)
           }
         }
       }

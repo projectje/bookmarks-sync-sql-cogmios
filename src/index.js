@@ -4,6 +4,7 @@ exports.BookmarksToSqlite = void 0;
 const path = require("path");
 const fse = require("fs-extra");
 const folder_1 = require("../src/folder");
+const firefox_1 = require("../src/firefox");
 const config_1 = require("../src/config");
 const sqljs_wrapper_cogmios_1 = require("sqljs-wrapper-cogmios");
 class BookmarksToSqlite {
@@ -35,7 +36,19 @@ class BookmarksToSqlite {
                 let parseUrl = new folder_1.ParseUrl();
                 parseUrl.pathId = this.config.dir[i].id;
                 parseUrl.rootLength = (this.config.dir[i].path + this.config.dir[i].root).length;
-                let result = await parseUrl.traverse(this.config.dir[i].root);
+                await parseUrl.traverse(this.config.dir[i].root);
+            }
+        }
+    }
+    async importFirefox() {
+        console.log(this.config);
+        if (this.config.firefox) {
+            for (let i = 0; i < this.config.firefox.length; i++) {
+                let firefox = new firefox_1.Firefox();
+                firefox.id = this.config.firefox[i].id;
+                firefox.path = this.config.firefox[i].path;
+                console.log(firefox.path);
+                await firefox.traverse(firefox.path);
             }
         }
     }

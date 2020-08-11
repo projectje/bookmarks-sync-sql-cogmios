@@ -3,7 +3,7 @@ dependencies:
   ini: 1.3.5
   parse-json: 5.0.1
   path: 0.12.7
-  sqljs-wrapper-cogmios: 1.0.2
+  sqljs-wrapper-cogmios: 1.0.4
   util: 0.12.3
 devDependencies:
   '@types/fs-extra': 9.0.1
@@ -2675,14 +2675,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-bxrJ/9rqJ2SA6hpHnSodRjKBugZHewRvNTITTt74W1VZWmzODjdS68yQW0/J9oC0NWKylHEtV1ptkoTyOYO4Tw==
-  /sqljs-wrapper-cogmios/1.0.2:
+  /sqljs-wrapper-cogmios/1.0.4:
     dependencies:
       electron-log: 4.2.2
       fs-extra: 9.0.1
       sql.js: 1.3.0
     dev: false
     resolution:
-      integrity: sha512-5DPXVHFlB14uFb9jDvQ1RLLbLqvaXXW9Frxv0gIia2LDD3uM77FFT8ymCkP0Bf+IPDj8/nqWAOHnJ1XJOf60dA==
+      integrity: sha512-JinZwxAZuxLszwwt4Eat31e8HTtEOFfwDjAiiOKOo4+ORa7jPoI2IwpdosyZAm2yAVdq4SCBqqONpFnRJKbcIA==
   /ssri/6.0.1:
     dependencies:
       figgy-pudding: 3.5.2
@@ -3251,7 +3251,7 @@ specifiers:
   parse-json: ^5.0.1
   path: ^0.12.7
   source-map-loader: ^1.0.1
-  sqljs-wrapper-cogmios: ^1.0.2
+  sqljs-wrapper-cogmios: ^1.0.4
   ts-loader: ^8.0.2
   typescript: ^3.9.7
   util: ^0.12.3

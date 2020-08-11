@@ -5,6 +5,11 @@
         "root" : "./test/testfiles",
         "lang" : "en_nl"
     }],
+    "firefox" : [{
+        "id" : "je.ed.bookmarks.firefox.1",
+        "path" : "C:\\Users\\gebruiker\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ptk95eju.default-1565147980514\\places.sqlite",
+        "lang" : "en_nl"
+    }],
     "databaselocation" : {
         "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/db/bookmarks.db"
     }

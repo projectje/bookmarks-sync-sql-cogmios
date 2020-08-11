@@ -2,6 +2,7 @@
 import * as path from 'path'
 import * as fse from 'fs-extra'
 import {ParseUrl} from '../src/folder'
+import {Firefox} from '../src/firefox'
 import {Config} from '../src/config'
 import {DatabaseCore} from "sqljs-wrapper-cogmios"
 
@@ -23,6 +24,7 @@ export class BookmarksToSqlite {
         let instance = DatabaseCore.getInstance()
         await instance.open()
         await this.importUrlDir()
+        //await this.importFirefox()
         await instance.close()
     }
 
@@ -45,17 +47,27 @@ export class BookmarksToSqlite {
     private async importUrlDir() {
         console.log(this.config)
         if (this.config.dir) {
-            // import every defined folder
             for(let i=0; i<this.config.dir.length; i++) {
                 let parseUrl = new ParseUrl()
                 parseUrl.pathId = this.config.dir[i].id
                 parseUrl.rootLength = (this.config.dir[i].path + this.config.dir[i].root).length
-                let result = await parseUrl.traverse(this.config.dir[i].root)
+                await parseUrl.traverse(this.config.dir[i].root)
             }
         }
     }
 
     // if specified import firefox bookmarks from defined profiles
-
+    private async importFirefox() {
+        console.log(this.config)
+        if (this.config.firefox) {
+            for(let i=0; i<this.config.firefox.length; i++) {
+                let firefox = new Firefox()
+                firefox.id = this.config.firefox[i].id
+                firefox.path = this.config.firefox[i].path
+                console.log(firefox.path)
+                await firefox.traverse(firefox.path)
+            }
+        }
+    }
 
 }
