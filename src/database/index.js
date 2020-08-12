@@ -3,7 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InternalDatabase = void 0;
 const sqljs_wrapper_cogmios_1 = require("sqljs-wrapper-cogmios");
 class InternalDatabase {
-    constructor() { }
+    constructor() {
+    }
+    static getInstance() {
+        if (!InternalDatabase.instance) {
+            InternalDatabase.instance = new InternalDatabase();
+        }
+        return InternalDatabase.instance;
+    }
     async insertItemUrl(url) {
         let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
         let itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?`, [url]);
@@ -15,9 +22,6 @@ class InternalDatabase {
     }
     async insertName(id, pathId, path) {
         let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
-        console.log(id);
-        console.log(pathId);
-        console.log(path);
         await instance.run("INSERT into itemProperty (itemUrlId, itemKey, itemValue) VALUES (?, ?, ?)", [id, pathId, path]);
     }
 }

@@ -2,7 +2,6 @@
 import * as ini from 'ini'
 import util = require('util')
 import * as fs from 'fs'
-import {DatabaseCore} from "sqljs-wrapper-cogmios"
 export const readdir = util.promisify(fs.readdir);
 import {InternalDatabase} from "../database"
 
@@ -35,7 +34,7 @@ export class ParseUrl {
             let name = `${dir.substr(this.rootLength)}${path.sep}${dirent.name.split('.').slice(0, -1).join('.')}`;
 
             var file = ini.parse(fs.readFileSync(fullname, 'utf-8'))
-            let interndatabase = new InternalDatabase()
+            let interndatabase = InternalDatabase.getInstance()
             let id = await interndatabase.insertItemUrl(file.InternetShortcut.URL)
             await interndatabase.insertName(id, this.pathId, name)
           }

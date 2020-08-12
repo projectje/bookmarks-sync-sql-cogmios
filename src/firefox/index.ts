@@ -5,7 +5,7 @@ export class Firefox {
 
     public id : string
     public path : string
-    public database: any
+    public placesDatabase: any
 
     constructor() { }
 
@@ -17,24 +17,32 @@ export class Firefox {
     async parenturl(parent: Number, title: string) {
         if (title === null) { title = "untitled"}
         if (parent && parent !== null) {
-            let parentRow = await this.database.getAsObject(`SELECT parent, title from moz_bookmarks where id = ?`, [parent]);
+            let parentRow = await this.placesDatabase.getAsObject(`SELECT parent, title from moz_bookmarks where id = ?`, [parent]);
             let parentTitle = (parentRow.title && parentRow.title !== null && parentRow.title != '') ? parentRow.title + "\\" + title : "\\untitled\\" + title
             title = await this.parenturl(parentRow.parent, parentTitle)
+        }
+        if (title.startsWith('\\untitled')) {
+            title = title.substring('\\untitled'.length)
         }
         return title
     }
 
-    async traverse(places: string) {
-        this.database = new Database(places)
-        await this.database.open()
-        let result = await this.database.getAsObjectArray("select t2.url, t2.id, t1.parent, t1.title from moz_bookmarks AS t1, moz_places AS t2 where t1.fk == t2.id", [])
-        await result.forEach( async (row) => {
-            let name = await this.parenturl(row.parent, row.title)
+    /**
+     * Somehow saves nothing to the database
+     * @param places
+     */
+    async traverse() {
+        this.placesDatabase = new Database(this.path)
+        await this.placesDatabase.open()
+        let result = await this.placesDatabase.getAsObjectArray("select t2.url, t2.id, t1.parent, t1.title from moz_bookmarks AS t1, moz_places AS t2 where t1.fk == t2.id", [])
+        for(let i=0; i<result.length; i++) {
+            let name = await this.parenturl(result[i].parent, result[i].title)
+            let interndatabase = InternalDatabase.getInstance()
+            let id = await interndatabase.insertItemUrl(result[i].url)
+            await interndatabase.insertName(id, this.id, name)
+        }
 
-            let interndatabase = new InternalDatabase()
-            let id = await interndatabase.insertItemUrl(row.url)
-            await interndatabase.insertName(id, this.id, name) // todo for some reason does not work
-        })
+        return true
     }
 
 }

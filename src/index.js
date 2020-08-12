@@ -18,19 +18,19 @@ class BookmarksToSqlite {
         let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
         await instance.open();
         await this.importUrlDir();
+        await this.importFirefox();
         await instance.close();
     }
     async initDatabase() {
+        let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
         if (this.config.databaselocation) {
             let database_uri = this.config.databaselocation.path;
-            let schema_query = await fse.readFile(path.join(__dirname, '/database/schema.sqlite'), 'utf8');
-            let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
             instance.setLocation(database_uri);
+            let schema_query = await fse.readFile(path.join(__dirname, '/database/schema.sqlite'), 'utf8');
             let initialized = await instance.init(schema_query);
         }
     }
     async importUrlDir() {
-        console.log(this.config);
         if (this.config.dir) {
             for (let i = 0; i < this.config.dir.length; i++) {
                 let parseUrl = new folder_1.ParseUrl();
@@ -39,18 +39,18 @@ class BookmarksToSqlite {
                 await parseUrl.traverse(this.config.dir[i].root);
             }
         }
+        return true;
     }
     async importFirefox() {
-        console.log(this.config);
         if (this.config.firefox) {
             for (let i = 0; i < this.config.firefox.length; i++) {
                 let firefox = new firefox_1.Firefox();
                 firefox.id = this.config.firefox[i].id;
                 firefox.path = this.config.firefox[i].path;
-                console.log(firefox.path);
-                await firefox.traverse(firefox.path);
+                await firefox.traverse();
             }
         }
+        return true;
     }
 }
 exports.BookmarksToSqlite = BookmarksToSqlite;

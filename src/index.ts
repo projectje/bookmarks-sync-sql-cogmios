@@ -24,7 +24,7 @@ export class BookmarksToSqlite {
         let instance = DatabaseCore.getInstance()
         await instance.open()
         await this.importUrlDir()
-        //await this.importFirefox()
+        await this.importFirefox()
         await instance.close()
     }
 
@@ -32,11 +32,11 @@ export class BookmarksToSqlite {
      * Inits a new database
      */
     private async initDatabase() {
+        let instance = DatabaseCore.getInstance()
         if (this.config.databaselocation) {
             let database_uri = this.config.databaselocation.path
+            instance.setLocation(database_uri)
             let schema_query = await fse.readFile(path.join(__dirname, '/database/schema.sqlite'), 'utf8')
-            let instance = DatabaseCore.getInstance()
-            instance.setLocation(database_uri);
             let initialized = await instance.init(schema_query);
         }
     }
@@ -45,7 +45,6 @@ export class BookmarksToSqlite {
      * If specified imports a folder
      */
     private async importUrlDir() {
-        console.log(this.config)
         if (this.config.dir) {
             for(let i=0; i<this.config.dir.length; i++) {
                 let parseUrl = new ParseUrl()
@@ -54,20 +53,20 @@ export class BookmarksToSqlite {
                 await parseUrl.traverse(this.config.dir[i].root)
             }
         }
+        return true
     }
 
     // if specified import firefox bookmarks from defined profiles
     private async importFirefox() {
-        console.log(this.config)
         if (this.config.firefox) {
             for(let i=0; i<this.config.firefox.length; i++) {
                 let firefox = new Firefox()
                 firefox.id = this.config.firefox[i].id
                 firefox.path = this.config.firefox[i].path
-                console.log(firefox.path)
-                await firefox.traverse(firefox.path)
+                await firefox.traverse()
             }
         }
+        return true
     }
 
 }
