@@ -20,16 +20,28 @@ export class InternalDatabase {
         return InternalDatabase.instance;
     }
 
-    async insertItemUrl(url) {
+    /**
+     * insert a url
+     * @param url
+     */
+    async insertItemUrl(url: string): Promise<number> {
         let instance = DatabaseCore.getInstance()
-        let itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?`, [url]);
-        if (Object.keys(itemUrl).length === 0 && itemUrl.constructor === Object) {
-            await instance.run(`INSERT into itemUrl (url) VALUES (?)`,[url] );
-            itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?;`, [url]);
+        let itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?`, [url])
+        if (itemUrl.id) {
+            return itemUrl.id
+        } else {
+            await instance.run(`INSERT into itemUrl (url) VALUES (?)`,[url] )
+            itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?;`, [url])
+            return itemUrl.id
         }
-        return itemUrl.id
     }
 
+    /**
+     * inserts a name
+     * @param id
+     * @param pathId
+     * @param path
+     */
     async insertName(id: number, pathId: string, path: string)
     {
         let instance = DatabaseCore.getInstance()

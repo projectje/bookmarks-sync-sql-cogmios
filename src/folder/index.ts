@@ -35,8 +35,14 @@ export class ParseUrl {
 
             var file = ini.parse(fs.readFileSync(fullname, 'utf-8'))
             let interndatabase = InternalDatabase.getInstance()
-            let id = await interndatabase.insertItemUrl(file.InternetShortcut.URL)
-            await interndatabase.insertName(id, this.pathId, name)
+            if (file && file.InternetShortcut && file.InternetShortcut.URL) {
+              let id = await interndatabase.insertItemUrl(file.InternetShortcut.URL)
+              await interndatabase.insertName(id, this.pathId, name)
+            }
+            // now e.g. reddit
+            // a. add as url e.g. https://www.reddit.com/r/sharepoint/
+            // b. give name as /reddit/sharepoint
+            // c. because there is a name tags/sharepoint to both they are linked
           }
         }
       }

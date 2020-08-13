@@ -28,7 +28,6 @@ export class Firefox {
     }
 
     /**
-     * Somehow saves nothing to the database
      * @param places
      */
     async traverse() {

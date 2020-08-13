@@ -14,11 +14,14 @@ class InternalDatabase {
     async insertItemUrl(url) {
         let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
         let itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?`, [url]);
-        if (Object.keys(itemUrl).length === 0 && itemUrl.constructor === Object) {
+        if (itemUrl.id) {
+            return itemUrl.id;
+        }
+        else {
             await instance.run(`INSERT into itemUrl (url) VALUES (?)`, [url]);
             itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?;`, [url]);
+            return itemUrl.id;
         }
-        return itemUrl.id;
     }
     async insertName(id, pathId, path) {
         let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();

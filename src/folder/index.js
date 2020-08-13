@@ -24,8 +24,10 @@ class ParseUrl {
                 let name = `${dir.substr(this.rootLength)}${path.sep}${dirent.name.split('.').slice(0, -1).join('.')}`;
                 var file = ini.parse(fs.readFileSync(fullname, 'utf-8'));
                 let interndatabase = database_1.InternalDatabase.getInstance();
-                let id = await interndatabase.insertItemUrl(file.InternetShortcut.URL);
-                await interndatabase.insertName(id, this.pathId, name);
+                if (file && file.InternetShortcut && file.InternetShortcut.URL) {
+                    let id = await interndatabase.insertItemUrl(file.InternetShortcut.URL);
+                    await interndatabase.insertName(id, this.pathId, name);
+                }
             }
         }
     }

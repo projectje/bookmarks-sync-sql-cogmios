@@ -5,6 +5,7 @@ import {ParseUrl} from '../src/folder'
 import {Firefox} from '../src/firefox'
 import {Config} from '../src/config'
 import {DatabaseCore} from "sqljs-wrapper-cogmios"
+import { Chrome } from './chrome'
 
 export class BookmarksToSqlite {
 
@@ -25,6 +26,7 @@ export class BookmarksToSqlite {
         await instance.open()
         await this.importUrlDir()
         await this.importFirefox()
+        await this.importChrome()
         await instance.close()
     }
 
@@ -64,6 +66,18 @@ export class BookmarksToSqlite {
                 firefox.id = this.config.firefox[i].id
                 firefox.path = this.config.firefox[i].path
                 await firefox.traverse()
+            }
+        }
+        return true
+    }
+
+    private async importChrome() {
+        if (this.config.chrome) {
+            for(let i=0; i<this.config.chrome.length; i++) {
+                let chrome = new Chrome()
+                chrome.id = this.config.chrome[i].id
+                chrome.path = this.config.chrome[i].path
+                await chrome.traverse()
             }
         }
         return true

@@ -1,21 +1,52 @@
 {
+    "user": "ed.je",
     "dir" : [{
-        "id" : "je.ed.bookmark.dir.1",
+        "id" : "dir.01",
         "path" : "c:/a/websites/bookmarks-sync-sql-cogmios",
         "root" : "./test/testfiles",
-        "lang" : "en_nl"
+        "lang" : "en_nl",
+        "InternetShortcut.URL": true,
+        "InternetShortcut.IDList": false,
+        "InternetShortcut.Hotkey": false,
+        "InternetShortcut.IconFile": false,
+        "InternetShortcut.IconIndex": false,
+        "Taxonomy.Dir" : true,
+        "Taxonomy.Menu" : true,
+        "Taxonomy.Toolbar": true,
+        "Taxonomy.Unfiled" : true,
+        "Taxonomy.Tags": true,
+        "Taxonomy.Mobile": true
     }],
     "firefox" : [{
-        "id" : "je.ed.bookmark.firefox.1",
+        "id" : "firefox.01",
         "path" : "C:\\Users\\gebruiker\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ptk95eju.default-1565147980514\\places.sqlite",
         "lang" : "en_nl",
-        "menu" : true,
-        "toolbar": true,
-        "unfiled" : true,
-        "tags": true,
-        "mobile": true
+        "Taxonomy.Menu" : true,
+        "Taxonomy.Toolbar": true,
+        "Taxonomy.Unfiled" : true,
+        "Taxonomy.Tags": true,
+        "Taxonomy.Mobile": true
+    }],
+    "chrome" : [{
+        "id" : "chrome.01",
+        "path" : "c:\\Users\\gebruiker\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Bookmarks",
+        "lang": "en_nl"
     }],
     "databaselocation" : {
         "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/db/bookmarks.db"
+    },
+    "naming": {
+        "*": "＊",
+        ".": "⋅",
+        "\"": "“",
+        "\\": "⧵",
+        "/" : "∕",
+        "[" : "［",
+        "]" : "］",
+        ":" : "∶",
+        ";" : ";",
+        "|" : "।",
+        "," : "‚",
+        "?" : "？"
     }
 }

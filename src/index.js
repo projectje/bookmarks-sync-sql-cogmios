@@ -7,6 +7,7 @@ const folder_1 = require("../src/folder");
 const firefox_1 = require("../src/firefox");
 const config_1 = require("../src/config");
 const sqljs_wrapper_cogmios_1 = require("sqljs-wrapper-cogmios");
+const chrome_1 = require("./chrome");
 class BookmarksToSqlite {
     constructor(bookmarksjson) {
         let configInstance = new config_1.Config();
@@ -19,6 +20,7 @@ class BookmarksToSqlite {
         await instance.open();
         await this.importUrlDir();
         await this.importFirefox();
+        await this.importChrome();
         await instance.close();
     }
     async initDatabase() {
@@ -48,6 +50,17 @@ class BookmarksToSqlite {
                 firefox.id = this.config.firefox[i].id;
                 firefox.path = this.config.firefox[i].path;
                 await firefox.traverse();
+            }
+        }
+        return true;
+    }
+    async importChrome() {
+        if (this.config.chrome) {
+            for (let i = 0; i < this.config.chrome.length; i++) {
+                let chrome = new chrome_1.Chrome();
+                chrome.id = this.config.chrome[i].id;
+                chrome.path = this.config.chrome[i].path;
+                await chrome.traverse();
             }
         }
         return true;

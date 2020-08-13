@@ -1,5 +1,4 @@
 ﻿const parseJson = require('parse-json');
-import * as path from 'path'
 import * as fse from 'fs-extra'
 
 /**
