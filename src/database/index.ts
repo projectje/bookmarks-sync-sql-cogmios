@@ -1,5 +1,8 @@
 ﻿
 import {DatabaseCore} from "sqljs-wrapper-cogmios"
+import { TextDecoder } from "util"
+import * as fse from 'fs-extra'
+import * as path from 'path'
 
 export class InternalDatabase {
 
@@ -8,6 +11,41 @@ export class InternalDatabase {
 
     // constructor with private access modifier
     private constructor() {
+    }
+
+    /**
+     * Open database
+     * @param databasePath
+     */
+    async open(databasePath: string) {
+        await this.initDatabase(databasePath)
+        let instance = DatabaseCore.getInstance()
+        await instance.open()
+    }
+
+    /**
+     * Closes a database connection
+     */
+    async close() {
+        let instance = DatabaseCore.getInstance()
+        await instance.close()
+    }
+
+    /**
+     * Inits a new database
+     */
+    private async initDatabase(databasePath: string) : Promise<boolean> {
+        let instance = DatabaseCore.getInstance()
+        try {
+            if (databasePath) {
+                let database_uri = databasePath
+                instance.setLocation(database_uri)
+                let schema_query = await fse.readFile(path.join(__dirname, 'schema.sqlite'), 'utf8')
+                return await instance.init(schema_query)
+            }
+        } catch (error) {
+            throw error
+        }
     }
 
     /**
@@ -24,16 +62,56 @@ export class InternalDatabase {
      * insert a url
      * @param url
      */
-    async insertItemUrl(url: string): Promise<number> {
-        let instance = DatabaseCore.getInstance()
-        let itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?`, [url])
-        if (itemUrl.id) {
-            return itemUrl.id
-        } else {
-            await instance.run(`INSERT into itemUrl (url) VALUES (?)`,[url] )
-            itemUrl = await instance.getAsObject(`SELECT * from itemUrl where url = ?;`, [url])
-            return itemUrl.id
+    async insertUrl(url: string): Promise<number> {
+        try {
+            let instance = DatabaseCore.getInstance()
+            await instance.run(`INSERT OR IGNORE INTO Url (url) VALUES (?);`,[url] )
+            let urlrecord = await instance.getAsObject(`SELECT * FROM Url WHERE url = ?;`, [url])
+            return urlrecord.id
         }
+        catch (e) {
+            console.error(e, url)
+            throw e
+        }
+    }
+
+    /**
+     * Inserts user in database
+     * @param user Name of current user
+     */
+    async insertUser(user: string) : Promise<number> {
+        try {
+            let instance = DatabaseCore.getInstance()
+            await instance.run("INSERT OR IGNORE INTO User (name) VALUES (?);", [user])
+            let userRecord = await instance.getAsObject("SELECT * FROM User WHERE name = ?;", [user])
+            return userRecord.id
+        }
+        catch (e) {
+            console.error(e, user)
+            throw e
+        }
+    }
+
+    /**
+     * Inserts a location
+     * @param location string e.g. firefox.01 for a specific firefox profile
+     */
+    async insertLocation(location: string) : Promise<number> {
+        let instance = DatabaseCore.getInstance()
+        await instance.run("INSERT OR IGNORE INTO Location (name) VALUES (?);", [location])
+        let locationRecord = await instance.getAsObject("SELECT * FROM Location WHERE name = ?;", [location])
+        return locationRecord.id
+    }
+
+    /**
+     * Inserts a root
+     * @param root string the unique set of top level names indicating the taxonomy
+     */
+    async insertRoot(root: string) : Promise<number> {
+        let instance = DatabaseCore.getInstance()
+        await instance.run("INSERT OR IGNORE INTO Root (name) VALUES (?);", [root])
+        let rootRecord = await instance.getAsObject("SELECT * FROM Root WHERE name = ?;", [root])
+        return rootRecord.id
     }
 
     /**
@@ -42,10 +120,16 @@ export class InternalDatabase {
      * @param pathId
      * @param path
      */
-    async insertName(id: number, pathId: string, path: string)
+    async insertName(urlId: number, userId: number, locationId: number, rootId: number, name: string)
     {
-        let instance = DatabaseCore.getInstance()
-        await instance.run("INSERT into itemProperty (itemUrlId, itemKey, itemValue) VALUES (?, ?, ?)", [id, pathId ,path])
+        try {
+            let instance = DatabaseCore.getInstance()
+            await instance.run("INSERT into Name (urlId, userId, locationId, rootId, name) VALUES (?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, name])
+        }
+        catch (e) {
+            console.error(e)
+            throw e
+        }
     }
 
 }

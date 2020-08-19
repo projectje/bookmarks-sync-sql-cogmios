@@ -4,53 +4,71 @@ import * as fse from "fs-extra";
 import { isArray } from "util";
 
 export class Chrome {
-  public id: string;
-  public path: string;
+  public user: string
+  public namespace: string
+  public path: string
 
+  /**
+   * constructor
+   */
   constructor() {}
 
   /**
    *
-   * @param title
-   * @param node
+   * @param userId number
+   * @param locationId number
+   * @param rootId number
+   * @param title string
+   * @param node any
    */
-  async parseNode(title: string, node: any) {
-    if (title === null || title === '') { title = "untitled"}
+  async parseNode(userId: number, locationId: number, rootId: number, title: string, node: any) : Promise<boolean> {
+    //if (title === null || title === '') { title = "untitled"}
+    //if (title.startsWith('untitled')) {
+    //  title = title.substring('untitled'.length+1)
+    //}
     if (node.type === "url") {
       let interndatabase = InternalDatabase.getInstance();
-      let id = await interndatabase.insertItemUrl(node.url);
+      let urlId = await interndatabase.insertUrl(node.url);
       let name =  (node.name.trim() != '') ? node.name : "untitled"
-      await interndatabase.insertName(id, this.id, title + "\\" + name);
+      await interndatabase.insertName(urlId, userId, locationId, rootId, title + "\\" + name);
       return true
     } else if (node.type === "folder") {
-      await this.parseNodes(title + "\\" + node.name, node.children);
+      await this.parseNodes(userId, locationId, rootId, title + "\\" + node.name, node.children);
     }
   }
 
   /**
-   * Parse one node in the json bookmark file
+   * Handles either node (toplevel) or array of nodes (further down)
    * @param title
    * @param node
    */
-  async parseNodes(title: string, node: any) {
+  async parseNodes(userId: number, locationId: number, rootId: number, title: string, node: any) : Promise<boolean> {
     if (Array.isArray(node)) {
       for(const nodeItem of node) {
-        let result = await this.parseNode(title, nodeItem);
+        let result = await this.parseNode(userId, locationId, rootId, title, nodeItem);
       }
     } else {
-      let result = await this.parseNode(title, node);
+      let result = await this.parseNode(userId, locationId, rootId, title, node);
     }
+    return true
   }
 
   /**
    * Traverse chrome json bookmark file
    */
-  async traverse() {
-    let json = fse.readFileSync(this.path, "utf8");
+  async traverse(userId: number, locationId: number, path: string) : Promise<boolean> {
+    let json = fse.readFileSync(path, "utf8");
     let chromeJsonBookmarks = JSON.parse(json);
-    if (chromeJsonBookmarks.roots.bookmark_bar) {await this.parseNodes("/bookmarkbar/", chromeJsonBookmarks.roots.bookmark_bar)}
-    if (chromeJsonBookmarks.roots.other) {await this.parseNodes("/other/", chromeJsonBookmarks.roots.other)}
-    if (chromeJsonBookmarks.roots.synced) {await this.parseNodes("/synced/", chromeJsonBookmarks.roots.synced)}
+
+    // handle the roots, these have external and internal names
+    let interndatabase = InternalDatabase.getInstance()
+    let rootId = await interndatabase.insertRoot("bookmarkbar")
+    await this.parseNodes(userId, locationId, rootId, "", chromeJsonBookmarks.roots.bookmark_bar.children)
+    rootId = await interndatabase.insertRoot("other")
+    await this.parseNodes(userId, locationId, rootId, "", chromeJsonBookmarks.roots.other.children)
+    rootId = await interndatabase.insertRoot("synced")
+    await this.parseNodes(userId, locationId, rootId, "", chromeJsonBookmarks.roots.synced.children)
+
     return true;
   }
 }

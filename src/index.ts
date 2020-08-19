@@ -1,18 +1,15 @@
-﻿
-import * as path from 'path'
-import * as fse from 'fs-extra'
+﻿import {Config} from '../src/config'
+import {InternalDatabase} from "../src/database"
 import {ParseUrl} from '../src/folder'
 import {Firefox} from '../src/firefox'
-import {Config} from '../src/config'
-import {DatabaseCore} from "sqljs-wrapper-cogmios"
-import { Chrome } from './chrome'
+import {Chrome} from './chrome'
 
 export class BookmarksToSqlite {
 
-    private config
+    private config: any
 
     /**
-     * Execution is determined by bookmarks.json
+     * Constructor reads config file
      */
     public constructor(bookmarksjson: string) {
         let configInstance = new Config()
@@ -20,64 +17,76 @@ export class BookmarksToSqlite {
         this.config = configInstance.config
     }
 
-    public async Run() {
-        await this.initDatabase()
-        let instance = DatabaseCore.getInstance()
-        await instance.open()
-        await this.importUrlDir()
-        await this.importFirefox()
-        await this.importChrome()
-        await instance.close()
-    }
-
     /**
-     * Inits a new database
+     * Run imports the indicated sources for specified user
      */
-    private async initDatabase() {
-        let instance = DatabaseCore.getInstance()
-        if (this.config.databaselocation) {
-            let database_uri = this.config.databaselocation.path
-            instance.setLocation(database_uri)
-            let schema_query = await fse.readFile(path.join(__dirname, '/database/schema.sqlite'), 'utf8')
-            let initialized = await instance.init(schema_query);
+    public async Run() {
+        try
+        {
+            let interndatabase = InternalDatabase.getInstance()
+            await interndatabase.open(this.config.databaselocation.path)
+            let userId = await interndatabase.insertUser(this.config.user)
+            await this.importUrlDir(userId)
+            await this.importFirefox(userId)
+            await this.importChrome(userId)
+            await interndatabase.close()
+        }
+        catch (e)
+        {
+            console.error(e)
+            throw e
         }
     }
 
     /**
      * If specified imports a folder
      */
-    private async importUrlDir() {
-        if (this.config.dir) {
-            for(let i=0; i<this.config.dir.length; i++) {
-                let parseUrl = new ParseUrl()
-                parseUrl.pathId = this.config.dir[i].id
-                parseUrl.rootLength = (this.config.dir[i].path + this.config.dir[i].root).length
-                await parseUrl.traverse(this.config.dir[i].root)
+    private async importUrlDir(userId: number) : Promise<boolean> {
+        try
+        {
+            if (this.config.import.dir) {
+                let importdir = this.config.import.dir
+                for(let i=0; i<importdir.length; i++) {
+                    let parseUrl = new ParseUrl()
+                    let interndatabase = InternalDatabase.getInstance()
+                    let locationId = await interndatabase.insertLocation(importdir[i].location)
+                    await parseUrl.traverse(importdir[i].root, userId, locationId, (importdir[i].path + importdir[i].root).length)
+                }
+            }
+            return true
+        }
+        catch (e)
+        {
+            console.error(e)
+            throw e
+        }
+    }
+
+    /**
+     * if specified imports one or more Firefox profile bookmarks
+     */
+    private async importFirefox(userId: number) : Promise<boolean> {
+        if (this.config.import.firefox) {
+            let importfirefox = this.config.import.firefox
+            for(let i=0; i<importfirefox.length; i++) {
+                let interndatabase = InternalDatabase.getInstance()
+                let locationId = await interndatabase.insertLocation(importfirefox[i].location)
+                await new Firefox().traverse(userId, locationId, importfirefox[i].path)
             }
         }
         return true
     }
 
-    // if specified import firefox bookmarks from defined profiles
-    private async importFirefox() {
-        if (this.config.firefox) {
-            for(let i=0; i<this.config.firefox.length; i++) {
-                let firefox = new Firefox()
-                firefox.id = this.config.firefox[i].id
-                firefox.path = this.config.firefox[i].path
-                await firefox.traverse()
-            }
-        }
-        return true
-    }
-
-    private async importChrome() {
-        if (this.config.chrome) {
-            for(let i=0; i<this.config.chrome.length; i++) {
-                let chrome = new Chrome()
-                chrome.id = this.config.chrome[i].id
-                chrome.path = this.config.chrome[i].path
-                await chrome.traverse()
+    /**
+     * if specified Imports one or more Chrome bookmarks
+     */
+    private async importChrome(userId: number) : Promise<boolean> {
+        if (this.config.import.chrome) {
+            let importchrome = this.config.import.chrome
+            for(let i=0; i<importchrome.length; i++) {
+                let interndatabase = InternalDatabase.getInstance()
+                let locationId = await interndatabase.insertLocation(importchrome[i].location)
+                await new Chrome().traverse(userId, locationId, importchrome[i].path)
             }
         }
         return true

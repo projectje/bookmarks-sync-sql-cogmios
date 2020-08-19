@@ -6,43 +6,39 @@ const parseJson = require("parse-json");
 const fse = require("fs-extra");
 class Chrome {
     constructor() { }
-    async parseNode(title, node) {
-        if (title === null || title === '') {
-            title = "untitled";
-        }
+    async parseNode(userId, locationId, rootId, title, node) {
         if (node.type === "url") {
             let interndatabase = database_1.InternalDatabase.getInstance();
-            let id = await interndatabase.insertItemUrl(node.url);
+            let urlId = await interndatabase.insertUrl(node.url);
             let name = (node.name.trim() != '') ? node.name : "untitled";
-            await interndatabase.insertName(id, this.id, title + "\\" + name);
+            await interndatabase.insertName(urlId, userId, locationId, rootId, title + "\\" + name);
             return true;
         }
         else if (node.type === "folder") {
-            await this.parseNodes(title + "\\" + node.name, node.children);
+            await this.parseNodes(userId, locationId, rootId, title + "\\" + node.name, node.children);
         }
     }
-    async parseNodes(title, node) {
+    async parseNodes(userId, locationId, rootId, title, node) {
         if (Array.isArray(node)) {
             for (const nodeItem of node) {
-                let result = await this.parseNode(title, nodeItem);
+                let result = await this.parseNode(userId, locationId, rootId, title, nodeItem);
             }
         }
         else {
-            let result = await this.parseNode(title, node);
+            let result = await this.parseNode(userId, locationId, rootId, title, node);
         }
+        return true;
     }
-    async traverse() {
-        let json = fse.readFileSync(this.path, "utf8");
+    async traverse(userId, locationId, path) {
+        let json = fse.readFileSync(path, "utf8");
         let chromeJsonBookmarks = JSON.parse(json);
-        if (chromeJsonBookmarks.roots.bookmark_bar) {
-            await this.parseNodes("/bookmarkbar/", chromeJsonBookmarks.roots.bookmark_bar);
-        }
-        if (chromeJsonBookmarks.roots.other) {
-            await this.parseNodes("/other/", chromeJsonBookmarks.roots.other);
-        }
-        if (chromeJsonBookmarks.roots.synced) {
-            await this.parseNodes("/synced/", chromeJsonBookmarks.roots.synced);
-        }
+        let interndatabase = database_1.InternalDatabase.getInstance();
+        let rootId = await interndatabase.insertRoot("bookmarkbar");
+        await this.parseNodes(userId, locationId, rootId, "", chromeJsonBookmarks.roots.bookmark_bar.children);
+        rootId = await interndatabase.insertRoot("other");
+        await this.parseNodes(userId, locationId, rootId, "", chromeJsonBookmarks.roots.other.children);
+        rootId = await interndatabase.insertRoot("synced");
+        await this.parseNodes(userId, locationId, rootId, "", chromeJsonBookmarks.roots.synced.children);
         return true;
     }
 }
