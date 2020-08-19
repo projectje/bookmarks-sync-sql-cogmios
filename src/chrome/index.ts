@@ -30,7 +30,13 @@ export class Chrome {
       let interndatabase = InternalDatabase.getInstance();
       let urlId = await interndatabase.insertUrl(node.url);
       let name =  (node.name.trim() != '') ? node.name : "untitled"
-      await interndatabase.insertName(urlId, userId, locationId, rootId, title + "\\" + name);
+      if (title.startsWith('\\')) {
+        title = title.substring(1)
+      }
+      if (title.endsWith('\\')) {
+          title = title.substring(0,title.length - 1)
+      }
+      await interndatabase.insertName(urlId, userId, locationId, rootId, title, name);
       return true
     } else if (node.type === "folder") {
       await this.parseNodes(userId, locationId, rootId, title + "\\" + node.name, node.children);

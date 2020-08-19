@@ -11,7 +11,13 @@ class Chrome {
             let interndatabase = database_1.InternalDatabase.getInstance();
             let urlId = await interndatabase.insertUrl(node.url);
             let name = (node.name.trim() != '') ? node.name : "untitled";
-            await interndatabase.insertName(urlId, userId, locationId, rootId, title + "\\" + name);
+            if (title.startsWith('\\')) {
+                title = title.substring(1);
+            }
+            if (title.endsWith('\\')) {
+                title = title.substring(0, title.length - 1);
+            }
+            await interndatabase.insertName(urlId, userId, locationId, rootId, title, name);
             return true;
         }
         else if (node.type === "folder") {

@@ -20,13 +20,13 @@ class ParseUrl {
                 await this.traverse(res, userId, locationId, rootLength);
             }
             else {
-                let fullname = `${dir}${path.sep}${dirent.name}`;
-                let name = `${dir.substr(rootLength)}${path.sep}${dirent.name.split('.').slice(0, -1).join('.')}`;
-                var file = ini.parse(fs.readFileSync(fullname, 'utf-8'));
+                let pathname = `${dir.substr(rootLength)}`;
+                let termname = `${dirent.name.split('.').slice(0, -1).join('.')}`;
+                var file = ini.parse(fs.readFileSync(`${dir}${path.sep}${dirent.name}`, 'utf-8'));
                 let interndatabase = database_1.InternalDatabase.getInstance();
                 if (file && file.InternetShortcut && file.InternetShortcut.URL) {
                     let urlId = await interndatabase.insertUrl(file.InternetShortcut.URL);
-                    await interndatabase.insertName(urlId, userId, locationId, 0, name);
+                    await interndatabase.insertName(urlId, userId, locationId, 0, pathname, termname);
                 }
             }
         }

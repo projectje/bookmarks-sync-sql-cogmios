@@ -17,6 +17,12 @@ class Firefox {
         if (title.startsWith('\\untitled')) {
             title = title.substring('\\untitled'.length + 1);
         }
+        if (title.startsWith('\\')) {
+            title = title.substring(1);
+        }
+        if (title.endsWith('\\')) {
+            title = title.substring(0, title.length - 1);
+        }
         return title;
     }
     async traverse(userId, locationId, path) {
@@ -25,13 +31,13 @@ class Firefox {
             await this.placesDatabase.open();
             let result = await this.placesDatabase.getAsObjectArray("select t2.url, t2.id, t1.parent, t1.title from moz_bookmarks AS t1, moz_places AS t2 where t1.fk == t2.id", []);
             for (let i = 0; i < result.length; i++) {
-                let name = await this.parenturl(result[i].parent, result[i].title);
+                let name = await this.parenturl(result[i].parent, '');
                 let interndatabase = database_2.InternalDatabase.getInstance();
                 let urlid = await interndatabase.insertUrl(result[i].url);
                 let root = name.split('\\')[0];
                 let rootId = await interndatabase.insertRoot(root);
-                name = name.substr(root.length);
-                await interndatabase.insertName(urlid, userId, locationId, rootId, name);
+                name = name.substr(root.length + 1);
+                await interndatabase.insertName(urlid, userId, locationId, rootId, name, result[i].title);
             }
             return true;
         }

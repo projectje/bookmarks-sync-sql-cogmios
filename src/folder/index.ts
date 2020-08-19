@@ -10,14 +10,17 @@ import {InternalDatabase} from "../database"
  */
 export class ParseUrl {
 
+  /**
+   *
+   */
   public constructor() {}
 
   /**
-   * Traverses one folder with URL files
    *
-   * @param dir string the location to traverse
-   * @param user string the user owning the folder
-   * @param location string the unique id for this location
+   * @param dir
+   * @param userId
+   * @param locationId
+   * @param rootLength
    */
   public async traverse(dir: string, userId: number, locationId: number, rootLength: number) {
         //console.log('traversing dir')
@@ -34,17 +37,13 @@ export class ParseUrl {
             //console.log(child)
             //console.log(relativeroot)
           } else {
-            let fullname = `${dir}${path.sep}${dirent.name}`
-            let name = `${dir.substr(rootLength)}${path.sep}${dirent.name.split('.').slice(0, -1).join('.')}`;
-
-            var file = ini.parse(fs.readFileSync(fullname, 'utf-8'))
+            let pathname = `${dir.substr(rootLength)}`
+            let termname = `${dirent.name.split('.').slice(0, -1).join('.')}`
+            var file = ini.parse(fs.readFileSync(`${dir}${path.sep}${dirent.name}`, 'utf-8'))
             let interndatabase = InternalDatabase.getInstance()
             if (file && file.InternetShortcut && file.InternetShortcut.URL) {
               let urlId = await interndatabase.insertUrl(file.InternetShortcut.URL)
-
-             // console.error(userId)
-              // todo: on a folder level the first folder is the specific root
-             await interndatabase.insertName(urlId, userId, locationId, 0, name)
+              await interndatabase.insertName(urlId, userId, locationId, 0, pathname, termname)
             }
             // now e.g. reddit
             // a. add as url e.g. https://www.reddit.com/r/sharepoint/

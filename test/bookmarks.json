@@ -10,31 +10,17 @@
             "InternetShortcut.IDList": false,
             "InternetShortcut.Hotkey": false,
             "InternetShortcut.IconFile": false,
-            "InternetShortcut.IconIndex": false,
-            "Taxonomy.Dir" : true,
-            "Taxonomy.Menu" : true,
-            "Taxonomy.Toolbar": true,
-            "Taxonomy.Unfiled" : true,
-            "Taxonomy.Tags": true,
-            "Taxonomy.Mobile": true
+            "InternetShortcut.IconIndex": false
         }],
         "firefox" : [{
             "location" : "firefox.01",
             "path" : "C:\\Users\\gebruiker\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\ptk95eju.default-1565147980514\\places.sqlite",
-            "lang" : "en_nl",
-            "Taxonomy.Menu" : true,
-            "Taxonomy.Toolbar": true,
-            "Taxonomy.Unfiled" : true,
-            "Taxonomy.Tags": true,
-            "Taxonomy.Mobile": true
+            "lang" : "en_nl"
         }],
         "chrome" : [{
             "location" : "chrome.01",
             "path" : "c:\\Users\\gebruiker\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Bookmarks",
-            "lang": "en_nl",
-            "Taxonomy.BookmarkBar" : true,
-            "Taxonomy.Other" : true,
-            "Taxonomy.Synced" : true
+            "lang": "en_nl"
         }]
     },
     "databaselocation" : {

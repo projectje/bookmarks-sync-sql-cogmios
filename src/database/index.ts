@@ -120,11 +120,11 @@ export class InternalDatabase {
      * @param pathId
      * @param path
      */
-    async insertName(urlId: number, userId: number, locationId: number, rootId: number, name: string)
+    async insertName(urlId: number, userId: number, locationId: number, rootId: number, path: string, name: string)
     {
         try {
             let instance = DatabaseCore.getInstance()
-            await instance.run("INSERT into Name (urlId, userId, locationId, rootId, name) VALUES (?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, name])
+            await instance.run("INSERT into Name (urlId, userId, locationId, rootId, path, name) VALUES (?, ?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, path, name])
         }
         catch (e) {
             console.error(e)
