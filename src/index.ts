@@ -3,6 +3,7 @@ import {InternalDatabase} from "../src/database"
 import {ParseUrl} from '../src/folder'
 import {Firefox} from '../src/firefox'
 import {Chrome} from './chrome'
+import {SimpleHtml} from './html'
 
 export class BookmarksToSqlite {
 
@@ -29,6 +30,7 @@ export class BookmarksToSqlite {
             await this.importUrlDir(userId)
             await this.importFirefox(userId)
             await this.importChrome(userId)
+            await this.exportSimpleHtml()
             await interndatabase.close()
         }
         catch (e)
@@ -91,5 +93,15 @@ export class BookmarksToSqlite {
         }
         return true
     }
+
+    private async exportSimpleHtml() : Promise<boolean> {
+        if (this.config.export && this.config.export.html) {
+            let exporthtml = this.config.export.html
+            for(let i=0; i<exporthtml.length; i++) {
+                await new SimpleHtml().export(this.config.export.html[i].path)
+            }
+        }
+        return true
+   }
 
 }

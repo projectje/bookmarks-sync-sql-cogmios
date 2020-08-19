@@ -1,4 +1,14 @@
 # bookmarks-sync-sql-cogmios
-read bookmarks stored in various locations
+Imports bookmarks in a sqlite database:
 
-writes bookmarks to various locations
+1. one or more directories of URL files
+2. one or more chrome profiles
+3. one or more firefox profiles
+
+Specify the settings in bookmarks.json and run
+
+`
+   await new BookmarksToSqlite('./test/bookmarks.json').Run()
+`
+
+

@@ -23,6 +23,11 @@
             "lang": "en_nl"
         }]
     },
+    "export": {
+        "html": [{
+            "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/test/simplehtmltest.html"
+        }]
+    },
     "databaselocation" : {
         "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/db/bookmarks.db"
     },

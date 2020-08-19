@@ -6,6 +6,7 @@ const database_1 = require("../src/database");
 const folder_1 = require("../src/folder");
 const firefox_1 = require("../src/firefox");
 const chrome_1 = require("./chrome");
+const html_1 = require("./html");
 class BookmarksToSqlite {
     constructor(bookmarksjson) {
         let configInstance = new config_1.Config();
@@ -20,6 +21,7 @@ class BookmarksToSqlite {
             await this.importUrlDir(userId);
             await this.importFirefox(userId);
             await this.importChrome(userId);
+            await this.exportSimpleHtml();
             await interndatabase.close();
         }
         catch (e) {
@@ -63,6 +65,15 @@ class BookmarksToSqlite {
                 let interndatabase = database_1.InternalDatabase.getInstance();
                 let locationId = await interndatabase.insertLocation(importchrome[i].location);
                 await new chrome_1.Chrome().traverse(userId, locationId, importchrome[i].path);
+            }
+        }
+        return true;
+    }
+    async exportSimpleHtml() {
+        if (this.config.export && this.config.export.html) {
+            let exporthtml = this.config.export.html;
+            for (let i = 0; i < exporthtml.length; i++) {
+                await new html_1.SimpleHtml().export(this.config.export.html[i].path);
             }
         }
         return true;
