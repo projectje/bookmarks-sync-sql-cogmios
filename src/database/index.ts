@@ -97,10 +97,16 @@ export class InternalDatabase {
      * @param location string e.g. firefox.01 for a specific firefox profile
      */
     async insertLocation(location: string) : Promise<number> {
-        let instance = DatabaseCore.getInstance()
-        await instance.run("INSERT OR IGNORE INTO Location (name) VALUES (?);", [location])
-        let locationRecord = await instance.getAsObject("SELECT * FROM Location WHERE name = ?;", [location])
-        return locationRecord.id
+        try {
+            let instance = DatabaseCore.getInstance()
+            await instance.run("INSERT OR IGNORE INTO Location (name) VALUES (?);", [location])
+            let locationRecord = await instance.getAsObject("SELECT * FROM Location WHERE name = ?;", [location])
+            return locationRecord.id
+        }
+        catch (e) {
+            console.error(e, location)
+            throw e
+        }
     }
 
     /**
@@ -108,10 +114,16 @@ export class InternalDatabase {
      * @param root string the unique set of top level names indicating the taxonomy
      */
     async insertRoot(root: string) : Promise<number> {
-        let instance = DatabaseCore.getInstance()
-        await instance.run("INSERT OR IGNORE INTO Root (name) VALUES (?);", [root])
-        let rootRecord = await instance.getAsObject("SELECT * FROM Root WHERE name = ?;", [root])
-        return rootRecord.id
+        try {
+            let instance = DatabaseCore.getInstance()
+            await instance.run("INSERT OR IGNORE INTO Root (name) VALUES (?);", [root])
+            let rootRecord = await instance.getAsObject("SELECT * FROM Root WHERE name = ?;", [root])
+            return rootRecord.id
+        }
+        catch (e) {
+            console.error(e, root)
+            throw e
+        }
     }
 
     /**
@@ -124,10 +136,10 @@ export class InternalDatabase {
     {
         try {
             let instance = DatabaseCore.getInstance()
-            await instance.run("INSERT into Name (urlId, userId, locationId, rootId, path, name) VALUES (?, ?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, path, name])
+            await instance.run("INSERT OR IGNORE into Name (urlId, userId, locationId, rootId, path, name) VALUES (?, ?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, path, name])
         }
         catch (e) {
-            console.error(e)
+            console.error(e, urlId, userId, locationId, rootId, path, name)
             throw e
         }
     }

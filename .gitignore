@@ -106,3 +106,5 @@ dist
 # and last but not least
 .js
 db/bookmarks.db
+test/export/
+test/dir/

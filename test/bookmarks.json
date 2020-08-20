@@ -25,7 +25,10 @@
     },
     "export": {
         "html": [{
-            "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/test/simplehtmltest.html"
+            "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/test/export/simplehtmltest.html"
+        }],
+        "dir" : [{
+            "path" : "c:/a/websites/bookmarks-sync-sql-cogmios/test/dir"
         }]
     },
     "databaselocation" : {

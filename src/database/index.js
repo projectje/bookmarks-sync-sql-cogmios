@@ -61,24 +61,36 @@ class InternalDatabase {
         }
     }
     async insertLocation(location) {
-        let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
-        await instance.run("INSERT OR IGNORE INTO Location (name) VALUES (?);", [location]);
-        let locationRecord = await instance.getAsObject("SELECT * FROM Location WHERE name = ?;", [location]);
-        return locationRecord.id;
+        try {
+            let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
+            await instance.run("INSERT OR IGNORE INTO Location (name) VALUES (?);", [location]);
+            let locationRecord = await instance.getAsObject("SELECT * FROM Location WHERE name = ?;", [location]);
+            return locationRecord.id;
+        }
+        catch (e) {
+            console.error(e, location);
+            throw e;
+        }
     }
     async insertRoot(root) {
-        let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
-        await instance.run("INSERT OR IGNORE INTO Root (name) VALUES (?);", [root]);
-        let rootRecord = await instance.getAsObject("SELECT * FROM Root WHERE name = ?;", [root]);
-        return rootRecord.id;
+        try {
+            let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
+            await instance.run("INSERT OR IGNORE INTO Root (name) VALUES (?);", [root]);
+            let rootRecord = await instance.getAsObject("SELECT * FROM Root WHERE name = ?;", [root]);
+            return rootRecord.id;
+        }
+        catch (e) {
+            console.error(e, root);
+            throw e;
+        }
     }
     async insertName(urlId, userId, locationId, rootId, path, name) {
         try {
             let instance = sqljs_wrapper_cogmios_1.DatabaseCore.getInstance();
-            await instance.run("INSERT into Name (urlId, userId, locationId, rootId, path, name) VALUES (?, ?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, path, name]);
+            await instance.run("INSERT OR IGNORE into Name (urlId, userId, locationId, rootId, path, name) VALUES (?, ?, ?, ?, ?, ?)", [urlId, userId, locationId, rootId, path, name]);
         }
         catch (e) {
-            console.error(e);
+            console.error(e, urlId, userId, locationId, rootId, path, name);
             throw e;
         }
     }
